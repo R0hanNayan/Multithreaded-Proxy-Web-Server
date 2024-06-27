@@ -41,7 +41,7 @@ int cache_size;
 
 int main(int argc, char* argv[]){
     int client_socketId, client_len;
-    struct sockaddr server_addr, client_addr;
+    struct sockaddr_in server_addr, client_addr;
     sem_init(&semaphore, 0, MAX_CLIENTS);
     pthread_mutex_init(&lock, NULL);
     if(argv == 2){
@@ -53,4 +53,24 @@ int main(int argc, char* argv[]){
     }
 
     printf("Starting Proxy Serve at Port: %d\n", port_number);
+
+    proxy_socketId = socket(AF_INET, SOCK_STREAM, 0);
+    if(proxy_socketId<0){
+        perror("Failed to create a Socket\n");
+        exit(1);
+    }
+    int reuse = 1;
+    if(setsockopt(proxy_socketId, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse))){
+        perror("setSockOpt failed\n");
+    }
+
+    bzero((char*)&server_addr, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port_number);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    if(bind(proxy_socketId, (struct sockaddr*)&server_addr, sizeof(server_addr)<0)){
+        perror("Port is not available\n");
+        exit(1);
+    }
+    print("Binding on port %d\n", port_number);
 }
