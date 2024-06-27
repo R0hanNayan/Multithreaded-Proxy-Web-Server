@@ -186,7 +186,7 @@ int handle_request(int clientSocket, struct ParsedRequest *request, char *tempRe
 	{
 		bytes_send = send(clientSocket, buf, bytes_send, 0);
 		
-		for(int i=0;i<bytes_send/sizeof(char);i++){
+		for(int i=0;i<(int)bytes_send/(int)sizeof(char);i++){
 			temp_buffer[temp_buffer_index] = buf[i];
 			// printf("%c",buf[i]); // Response Printing
 			temp_buffer_index++;
@@ -270,7 +270,7 @@ void* thread_fn(void* socketNew)
 	
 	char *tempReq = (char*)malloc(strlen(buffer)*sizeof(char)+1);
     //tempReq, buffer both store the http request sent by client
-	for (int i = 0; i < strlen(buffer); i++)
+	for (int i = 0; i < (int)strlen(buffer); i++)
 	{
 		tempReq[i] = buffer[i];
 	}
